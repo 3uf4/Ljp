@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucky Jet Pro - Prédicteur</title>
+  <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+	width: 100%;
+      background-color: #1d1130;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header {
+      background-color: #2d0055;
+      padding: 30px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand {
+      font-size: 28px;
+      font-family: 'Russo One', sans-serif;
+      user-select: none;
+    }
+
+    .main-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+	height: 90vh;
+	margin: 0;
+	padding: 0;
+    }
+
+    .container {
+      background-color: #2d0055;
+      padding: 40px 20px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      align-items: center;
+    }
+
+    .logo-container img {
+      width: 300px;
+      margin-bottom: 15px;
+	margin-top: -150px;
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffa500;
+      margin-bottom: 10px;
+    }
+
+    #predictBtn {
+      position: relative;
+      padding: 12px 25px;
+      font-size: 18px;
+      background: linear-gradient(145deg, #3cf08b, #28b063);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 15px rgba(52, 224, 112, 0.3);
+      user-select: none;
+    }
+
+    #predictBtn:hover {
+      background-color: #2fc664;
+    }
+
+    .shine-effect {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.2) 100%
+      );
+      transform: skewX(-20deg);
+      pointer-events: none;
+      opacity: 0.8;
+      z-index: 2;
+    }
+
+    .shine-animate {
+      animation: shineMove 1.2s ease-in-out;
+    }
+
+    @keyframes shineMove {
+      0% { left: -75%; }
+      100% { left: 125%; }
+    }
+
+    #loader {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .bar {
+      width: 80%;
+      height: 14px;
+      background-color: #6e3391;
+      margin: 20px auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 0 10px #00000060;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(
+        to right,
+        #34e070 0,
+        #34e070 10px,
+        white 10px,
+        white 20px
+      );
+      background-size: 20px 100%;
+      animation: stripeMove 1s linear infinite, gelPulse 1.5s ease-in-out infinite;
+      border-radius: 10px;
+      filter: drop-shadow(0 0 5px #34e070aa);
+    }
+
+    @keyframes stripeMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 20px 0; }
+    }
+
+    @keyframes gelPulse {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(1.1); }
+    }
+
+    .dot-animation::after {
+      content: '';
+      display: inline-block;
+      width: 1em;
+      text-align: left;
+      animation: dots 1.5s steps(3, end) infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: ''; }
+      33%  { content: '.'; }
+      66%  { content: '..'; }
+      100% { content: '...'; }
+    }
+
+    .analyzing-text {
+      font-size: 14px;
+      color: #ccc;
+      font-style: italic;
+      user-select: none;
+    }
+
+    .spinner {
+      border: 4px solid #ffffff30;
+      border-top: 4px solid #34e070;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto 0;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
+    #loadingText {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 6px;
+      display: none;
+      user-select: none;
+      font-style: italic;
+    }
+
+    #prediction {
+      font-size: 32px;
+      margin-top: 30px;
+      color: #fff;
+      font-family: 'Russo One', sans-serif;
+      font-weight: 700;
+      display: none;
+      animation: jackpot 0.4s ease-out forwards;
+      user-select: none;
+    }
+
+    @keyframes jackpot {
+      0% {
+        opacity: 0;
+        transform: scale(0.1) rotateX(180deg);
+        filter: blur(6px);
+      }
+      60% {
+        transform: scale(1.2);
+      }
+      80% {
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="brand">
+      <span style="color: #a259ff;">LU</span><span style="color: white;">C</span><span style="color: #a259ff;">KY</span><span style="color: #ffa500;"> JET</span> Pro
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="container">
+      <div class="logo-container">
+        <img src="Icon-lucky-jet-1win-Kenya.png" alt="Logo Lucky Jet" />
+      </div>
+      <div class="title">Prédicteur Officiel de Lucky Jet</div>
+
+      <button id="predictBtn" onclick="startPrediction()">
+        Nouvelle prédiction
+        <span class="shine-effect" id="shine"></span>
+      </button>
+
+      <div id="loader">
+        <div class="bar"><div class="fill"></div></div>
+        <p class="analyzing-text">Analyse de l'algorithme Lucky Jet<span class="dot-animation"></span></p>
+      </div>
+
+      <div id="circleLoader" class="spinner"></div>
+      <p id="loadingText">Chargement du prochain pronostic<span class="dot-animation"></span></p>
+
+      <div id="prediction"></div>
+    </div>
+  </div>
+
+  <script>
+    const predictionSequence = ["x5.30", "x1.89", "x3.12", "x5.00", "x1.54", "x2.26", "x7.35"];
+    let currentIndex = 0;
+
+    function shineLoop() {
+      const shine = document.getElementById('shine');
+      setTimeout(() => {
+        shine.classList.add('shine-animate');
+        setTimeout(() => {
+          shine.classList.remove('shine-animate');
+          shineLoop();
+        }, 1200);
+      }, 5000);
+    }
+    shineLoop();
+
+    function randomRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function simulateFill(callback) {
+      const fillBar = document.querySelector('.fill');
+      fillBar.style.width = '0%';
+      let progress = 0;
+
+      function updateBar() {
+        const increment = randomRange(5, 20);
+        progress += increment;
+        if (progress > 100) progress = 100;
+        fillBar.style.width = progress + '%';
+
+        if (progress < 100) {
+          setTimeout(updateBar, randomRange(100, 300));
+        } else {
+          callback();
+        }
+      }
+
+      updateBar();
+    }
+
+    function startPrediction() {
+      document.getElementById('predictBtn').style.display = 'none';
+      document.getElementById('prediction').style.display = 'none';
+      document.getElementById('circleLoader').style.display = 'none';
+      document.getElementById('loadingText').style.display = 'none';
+      document.getElementById('loader').style.display = 'block';
+
+      simulateFill(() => {
+        document.getElementById('loader').style.display = "none";
+        document.getElementById('circleLoader').style.display = "block";
+        document.getElementById('loadingText').style.display = "block";
+
+        setTimeout(() => {
+          document.getElementById('circleLoader').style.display = "none";
+          document.getElementById('loadingText').style.display = "none";
+          showPrediction();
+        }, randomRange(800, 2000));
+      });
+    }
+
+    function showPrediction() {
+      const predictionElem = document.getElementById('prediction');
+      predictionElem.innerHTML = `🏆 PRÉDICTION: <span style="color: #34e070;">${predictionSequence[currentIndex]}</span>`;
+      predictionElem.style.display = "block";
+
+      const shine = document.getElementById('shine');
+      shine.classList.add('shine-animate');
+      setTimeout(() => shine.classList.remove('shine-animate'), 1200);
+
+      currentIndex = (currentIndex + 1) % predictionSequence.length;
+
+      // Delay showing button after prediction (1s to 2.5s random)
+      const delay = randomRange(1000, 2500);
+      setTimeout(() => {
+        document.getElementById('predictBtn').style.display = "inline-block";
+      }, delay);
+    }
+  </script>
+</body>
+</html>
