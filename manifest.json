@@ -1,0 +1,15 @@
+{
+  "name": "Lucky Jet Pro",
+  "short_name": "Lucky Jet Pro",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
